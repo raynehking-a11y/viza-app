@@ -9,18 +9,14 @@
         :root { --primary: #38bdf8; --success: #22c55e; --bg: #0f172a; }
         body { background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         .container { width: 90%; max-width: 400px; background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(20px); padding: 30px; border-radius: 30px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        
         #points-box { font-size: 55px; font-weight: 900; color: var(--primary); margin: 5px 0; }
         .progress-container { background: #1e293b; height: 14px; border-radius: 20px; margin: 15px 0; border: 1px solid #334155; }
         .progress-bar { background: linear-gradient(90deg, #0284c7, #38bdf8); height: 100%; border-radius: 20px; width: 0%; transition: 1.5s ease-in-out; }
-        
         .okx-badge { background: #000; color: #fff; padding: 5px 15px; border-radius: 50px; font-size: 11px; display: inline-block; margin-bottom: 20px; border: 1px solid #333; }
-        
         button { width: 100%; padding: 16px; margin: 10px 0; border-radius: 18px; border: none; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-google { background: white; color: #1e293b; font-size: 16px; }
         .btn-earn { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
         .btn-withdraw { background: #f59e0b; color: white; }
-        
         #loader { position: fixed; inset: 0; background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 100; }
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -45,21 +41,18 @@
             <div id="points-box">0.00</div>
             <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
             <p style="font-size: 11px; color: #64748b;">تأكد من تثبيت تطبيق OKX لاستلام أرباحك</p>
-
             <button class="btn-earn" id="earn-btn">📺 مشاهدة فيديو اليوم (+1.00)</button>
             <button class="btn-withdraw" id="draw-btn">💰 طلب سحب أرباح (OKX)</button>
             <button style="background: #8b5cf6; color: white;" id="ref-btn">🔗 نسخ رابط الدعوة (+10)</button>
-            
             <button style="background: transparent; color: #ef4444; border: 1px solid #ef4444; margin-top: 15px;" id="logout-btn">تسجيل خروج</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithRedirect, onAuthStateChanged, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, onAuthStateChanged, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // إعدادات صوفي (Firebase) - لا تقم بتغييرها
         const firebaseConfig = {
             apiKey: "AIzaSyA8n2m3L1QlKAJr-ZGLXUtbImOq29-lsOk",
             authDomain: "mstufa-1f409.firebaseapp.com",
@@ -72,8 +65,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // رابط الإعلان الذكي الخاص بك من Adsterra
+        const provider = new GoogleAuthProvider();
         const ADS_URL = "https://s-vignette.com/smartlink/28912814";
 
         onAuthStateChanged(auth, async (user) => {
@@ -86,14 +78,10 @@
                 const snap = await getDoc(userRef);
                 if (snap.exists()) {
                     const data = snap.data();
-                    document.getElementById('points-box').innerText = data.points.toFixed(2);
-                    document.getElementById('progress-bar').style.width = Math.min((data.points / 1000) * 100, 100) + "%";
+                    document.getElementById('points-box').innerText = (data.points || 0).toFixed(2);
+                    document.getElementById('progress-bar').style.width = Math.min(((data.points || 0) / 1000) * 100, 100) + "%";
                 } else {
-                    const ref = new URLSearchParams(window.location.search).get('ref');
                     await setDoc(userRef, { points: 0, lastAd: 0 });
-                    if (ref) {
-                        try { await updateDoc(doc(db, "users", ref), { points: increment(10) }); } catch(e) {}
-                    }
                     location.reload();
                 }
             } else {
@@ -102,37 +90,34 @@
             }
         });
 
-        document.getElementById('login-btn').onclick = () => signInWithRedirect(auth, new GoogleAuthProvider());
+        document.getElementById('login-btn').onclick = () => {
+            signInWithPopup(auth, provider).catch((error) => {
+                Swal.fire('خطأ', 'حدثت مشكلة أثناء تسجيل الدخول: ' + error.message, 'error');
+            });
+        };
 
         document.getElementById('earn-btn').onclick = async () => {
             const userRef = doc(db, "users", auth.currentUser.uid);
             const snap = await getDoc(userRef);
             const lastAdTime = snap.data().lastAd || 0;
-
             if (Date.now() - lastAdTime < 86400000) {
                 return Swal.fire('انتظر يا بطل!', 'يمكنك الربح مرة كل 24 ساعة.', 'info');
             }
-
-            // فتح الإعلان الخاص بك
             window.open(ADS_URL, '_blank');
-
-            // مؤقت 30 ثانية لضمان المشاهدة
             let timeLeft = 30;
             Swal.fire({
                 title: 'شاهد الإعلان للحصول على النقطة',
-                html: `باقي <b id="timer-val">${timeLeft}</b> ثانية...<br><small>لا تغلق التطبيق حتى ينتهي المؤقت</small>`,
+                html: `باقي <b id="timer-val">${timeLeft}</b> ثانية...`,
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 didOpen: () => {
                     const t = setInterval(async () => {
                         timeLeft--;
-                        if (document.getElementById('timer-val')) {
-                            document.getElementById('timer-val').innerText = timeLeft;
-                        }
+                        if (document.getElementById('timer-val')) document.getElementById('timer-val').innerText = timeLeft;
                         if (timeLeft <= 0) {
                             clearInterval(t);
                             await updateDoc(userRef, { points: increment(1), lastAd: Date.now() });
-                            Swal.fire('كفو!', '+1.00 نقطة انضافت لرصيدك.', 'success').then(() => location.reload());
+                            Swal.fire('كفو!', '+1.00 نقطة انضافت.', 'success').then(() => location.reload());
                         }
                     }, 1000);
                 }
@@ -143,27 +128,17 @@
             const snap = await getDoc(doc(db, "users", auth.currentUser.uid));
             if (snap.data().points >= 1000) {
                 const { value: okxAddress } = await Swal.fire({
-                    title: 'سحب الأرباح عبر OKX',
-                    text: 'اذهب لتطبيق OKX -> إيداع (Deposit) -> اختر USDT -> انسخ عنوان المحفظة والصقه هنا:',
+                    title: 'سحب الأرباح',
                     input: 'text',
-                    inputPlaceholder: 'الصق عنوان المحفظة هنا...',
-                    showCancelButton: true,
-                    confirmButtonText: 'إرسال للمدير',
-                    cancelButtonText: 'إلغاء'
+                    inputPlaceholder: 'الصق عنوان OKX هنا...',
+                    showCancelButton: true
                 });
-
                 if (okxAddress) {
-                    const msg = `طلب سحب 🚀\nID: ${auth.currentUser.uid}\nالمبلغ: 1000 نقطة\nعنوان OKX:\n${okxAddress}`;
-                    window.open(`https://t.me/sofi_hub?text=${encodeURIComponent(msg)}`);
+                    window.open(`https://t.me/sofi_hub?text=طلب سحب من ${auth.currentUser.uid}\nالعنوان: ${okxAddress}`);
                 }
             } else {
-                Swal.fire('الرصيد غير كافٍ', 'تحتاج للوصول إلى 1000 نقطة أولاً.', 'error');
+                Swal.fire('الرصيد غير كافٍ', 'تحتاج 1000 نقطة.', 'error');
             }
-        };
-
-        document.getElementById('ref-btn').onclick = () => {
-            navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?ref=${auth.currentUser.uid}`);
-            Swal.fire('تم النسخ!', 'شارك رابطك واربح 10 نقاط عن كل صديق.', 'success');
         };
 
         document.getElementById('logout-btn').onclick = () => signOut(auth);
