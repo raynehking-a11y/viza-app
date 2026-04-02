@@ -12,7 +12,8 @@
         .points-box { background: linear-gradient(145deg, #1e293b, #0f172a); padding: 25px; border-radius: 25px; margin-bottom: 25px; border: 2px solid var(--primary); }
         #points-val { font-size: 54px; font-weight: 900; color: var(--primary); display: block; }
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .btn-action { background: #334155; padding: 20px 10px; border-radius: 20px; cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); text-decoration: none; color: white; }
+        .btn-action { background: #334155; padding: 20px 10px; border-radius: 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); color: white; }
+        .vip-card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border-right: 4px solid var(--accent); }
         .btn-withdraw { background: #22c55e; color: white; padding: 15px; border-radius: 20px; width: 100%; font-weight: bold; font-size: 18px; border: none; margin-top: 20px; cursor: pointer; }
         #loader { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
@@ -35,14 +36,24 @@
     </div>
 
     <div class="action-grid">
-        <a href="https://s-vignette.com/smartlink/28912814" target="_blank" class="btn-action" id="video-link">
+        <div class="btn-action" id="video-btn">
             <span>📺</span>
             <div style="font-size:14px; margin-top:5px;">شاهد واربح</div>
-        </a>
+        </div>
         <div class="btn-action" id="spin-btn">
             <span>🎡</span>
             <div style="font-size:14px; margin-top:5px;">عجلة الحظ</div>
         </div>
+    </div>
+
+    <h4 style="text-align:right; margin-bottom:10px;">💎 باقات الـ VIP</h4>
+    <div class="vip-card">
+        <div style="text-align:right;"><b>الباقة الفضية</b><br><small>أرباح x2</small></div>
+        <button onclick="contactSofi('Silver')" style="background:silver; color:black; border:none; padding:8px 15px; border-radius:10px; cursor:pointer;">تفعيل</button>
+    </div>
+    <div class="vip-card" style="border-right-color: gold;">
+        <div style="text-align:right;"><b>الباقة الذهبية</b><br><small>أرباح x5</small></div>
+        <button onclick="contactSofi('Gold')" style="background:gold; color:black; border:none; padding:8px 15px; border-radius:10px; cursor:pointer;">تفعيل</button>
     </div>
 
     <button class="btn-withdraw" id="withdraw-btn">💰 طلب سحب (OKX)</button>
@@ -67,6 +78,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
+    const ADS_URL = "https://s.vignette.com/smartlink/28912814";
     const SOFI_TG = "https://t.me/x00x0f";
 
     onAuthStateChanged(auth, async (user) => {
@@ -78,7 +90,7 @@
             if (snap.exists()) {
                 document.getElementById('points-val').innerText = snap.data().points.toFixed(2);
             } else {
-                await setDoc(doc(db, "users", user.uid), { points: 0 });
+                await setDoc(doc(db, "users", user.uid), { points: 0, vip: 'Normal' });
                 location.reload();
             }
         } else {
@@ -89,22 +101,24 @@
 
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
 
-    // نظام الربح الجديد: يفتح الإعلان ويبدأ المؤقت فوراً
-    document.getElementById('video-link').onclick = function() {
+    document.getElementById('video-btn').onclick = () => {
         let timeLeft = 30;
         Swal.fire({
-            title: 'جاري فتح الإعلان...',
-            html: `انتظر <b id="timer" style="color:#38bdf8;">${timeLeft}</b> ثانية لاستلام الربح.`,
-            showConfirmButton: false,
+            title: 'استعد للربح!',
+            html: `سيفتح الإعلان الآن. انتظر <b id="timer" style="color:#38bdf8;">${timeLeft}</b> ثانية هنا لاستلام نقاطك.`,
+            showConfirmButton: true,
+            confirmButtonText: 'فتح الإعلان وبدء العداد',
             allowOutsideClick: false,
-            didOpen: () => {
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(ADS_URL, '_blank');
                 const t = setInterval(async () => {
                     timeLeft--;
                     if(document.getElementById('timer')) document.getElementById('timer').innerText = timeLeft;
                     if(timeLeft <= 0) {
                         clearInterval(t);
                         await updateDoc(doc(db, "users", auth.currentUser.uid), { points: increment(1) });
-                        Swal.fire('كفو!', 'انضافت 1 نقطة', 'success').then(()=>location.reload());
+                        Swal.fire('أحسنت!', 'تمت إضافة 1 نقطة', 'success').then(()=>location.reload());
                     }
                 }, 1000);
             }
@@ -114,8 +128,10 @@
     document.getElementById('spin-btn').onclick = async () => {
         const win = (Math.random() * 2).toFixed(2);
         await updateDoc(doc(db, "users", auth.currentUser.uid), { points: increment(parseFloat(win)) });
-        Swal.fire('🎡 حظك اليوم', `ربحت ${win} نقطة!`, 'success').then(()=>location.reload());
+        Swal.fire('🎡 عجلة الحظ', `ربحت ${win} نقطة!`, 'success').then(()=>location.reload());
     };
+
+    window.contactSofi = (plan) => window.open(`${SOFI_TG}?text=اريد تفعيل باقة ${plan} لحسابي: ${auth.currentUser.uid}`);
 
     document.getElementById('withdraw-btn').onclick = () => {
         Swal.fire({ title: 'سحب OKX', input: 'text', inputPlaceholder: 'عنوان USDT' }).then((res) => {
