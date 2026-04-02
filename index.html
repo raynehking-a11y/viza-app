@@ -6,13 +6,12 @@
     <title>VIZA Hub - Earn & Spin</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --primary: #38bdf8; --bg: #0f172a; --card: #1e293b; --success: #22c55e; }
+        :root { --primary: #38bdf8; --bg: #0f172a; --card: #1e293b; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         .container { width: 100%; max-width: 400px; background: var(--card); padding: 25px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .points-display { background: rgba(56, 189, 248, 0.1); padding: 20px; border-radius: 20px; border: 1px dashed var(--primary); margin-bottom: 20px; }
         #points-val { font-size: 50px; font-weight: bold; color: var(--primary); display: block; }
-        .btn-main { background: #334155; padding: 18px; border-radius: 18px; cursor: pointer; border: none; color: white; width: 100%; font-size: 17px; margin-bottom: 12px; transition: 0.3s; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-main:active { transform: scale(0.96); }
+        .btn-main { background: #334155; padding: 18px; border-radius: 18px; cursor: pointer; border: none; color: white; width: 100%; font-size: 17px; margin-bottom: 12px; transition: 0.3s; font-weight: bold; }
         .btn-ads { background: linear-gradient(135deg, #0284c7, #38bdf8); }
         .btn-withdraw { background: #f59e0b; margin-top: 10px; }
         .footer-text { font-size: 12px; color: #64748b; margin-top: 15px; }
@@ -27,12 +26,8 @@
         <small style="color: var(--primary);">جاهز للسحب عبر OKX</small>
     </div>
 
-    <button class="btn-main btn-ads" id="task-btn">
-        🎯 نفذ مهمة الربح (1.00+)
-    </button>
-    
+    <button class="btn-main btn-ads" id="task-btn">🎯 المهمة اليومية (1.00+)</button>
     <button class="btn-main" id="spin-btn">🎡 عجلة الحظ اليومية</button>
-    
     <button class="btn-main btn-withdraw" id="withdraw-btn">💰 طلب سحب الأرباح</button>
     
     <p class="footer-text">بإدارة المبرمج صوفي - VIZA Pro</p>
@@ -56,9 +51,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // الرابط الجديد اللي عطيته إلي
-    const ADS_URL = "https://www.profitablecpmratenetwork.com/z27v2ey2q?key=19c606938d6f933a67243d9ebfa39d70";
-    const SOFI_TG = "https://t.me/x00x0f";
+    const SHORT_URL = "https://shrinkme.click/jkhs"; // رابطك الجديد
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -69,14 +62,22 @@
         }
     });
 
-    // تفعيل زر المهمة
-    document.getElementById('task-btn').onclick = () => {
-        window.open(ADS_URL, '_blank');
+    document.getElementById('task-btn').onclick = async () => {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const snap = await getDoc(userRef);
+        const now = Date.now();
+        
+        if (snap.exists() && snap.data().lastTask && (now - snap.data().lastTask < 24 * 60 * 60 * 1000)) {
+            Swal.fire('عذراً!', 'لقد أكملت مهمتك اليوم، عد بعد 24 ساعة!', 'warning');
+            return;
+        }
+
+        window.open(SHORT_URL, '_blank');
         
         let timeLeft = 30;
         Swal.fire({
-            title: 'جاري فحص المهمة...',
-            html: `يرجى الانتظار <b id="timer" style="color:var(--primary); font-size:25px;">${timeLeft}</b> ثانية لضمان إضافة النقاط.`,
+            title: 'جاري التحقق...',
+            html: `انتظر <b id="timer" style="color:var(--primary);">${timeLeft}</b> ثانية لإضافة النقاط.`,
             icon: 'info',
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -86,33 +87,26 @@
                     if(document.getElementById('timer')) document.getElementById('timer').innerText = timeLeft;
                     if(timeLeft <= 0) {
                         clearInterval(countdown);
-                        await updateDoc(doc(db, "users", auth.currentUser.uid), { points: increment(1.00) });
-                        Swal.fire('أحسنت!', 'تمت إضافة 1.00 نقطة لرصيدك', 'success').then(()=>location.reload());
+                        await updateDoc(userRef, { points: increment(1.00), lastTask: Date.now() });
+                        Swal.fire('مبروك!', 'تمت إضافة 1.00 نقطة لرصيدك', 'success').then(()=>location.reload());
                     }
                 }, 1000);
             }
         });
     };
 
-    // تفعيل عجلة الحظ بتصميم احترافي
     document.getElementById('spin-btn').onclick = () => {
-        Swal.fire({
-            title: '🎡 دوران الحظ...',
-            text: 'جاري سحب جائزتك العشوائية',
-            timer: 2000,
-            showConfirmButton: false,
-            didOpen: () => { Swal.showLoading(); }
+        Swal.fire({ title: '🎡 دوران الحظ...', text: 'جاري السحب', timer: 2000, showConfirmButton: false, didOpen: () => { Swal.showLoading(); }
         }).then(async () => {
-            const prizes = [0.1, 0.5, 1.0, 2.0]; // جوائز متنوعة
+            const prizes = [0.1, 0.5, 1.0, 2.0];
             const win = prizes[Math.floor(Math.random() * prizes.length)];
             await updateDoc(doc(db, "users", auth.currentUser.uid), { points: increment(win) });
-            Swal.fire('مبروك!', `لقد ربحت ${win} نقطة إضافية!`, 'success').then(()=>location.reload());
+            Swal.fire('مبروك!', `لقد ربحت ${win} نقطة!`, 'success').then(()=>location.reload());
         });
     };
 
-    // طلب السحب
     document.getElementById('withdraw-btn').onclick = () => {
-        window.open(`${SOFI_TG}?text=أهلاً صوفي، أريد سحب أرباحي من تطبيق VIZA`);
+        window.open("https://t.me/x00x0f?text=طلب سحب أرباح");
     };
 </script>
 </body>
