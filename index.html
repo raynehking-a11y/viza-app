@@ -78,7 +78,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
-    const ADS_URL = "https://s.vignette.com/smartlink/28912814";
+    const ADS_URL = "https://s-vignette.com/smartlink/28912814";
     const SOFI_TG = "https://t.me/x00x0f";
 
     onAuthStateChanged(auth, async (user) => {
@@ -102,23 +102,21 @@
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
 
     document.getElementById('video-btn').onclick = () => {
+        window.open(ADS_URL, '_blank');
         let timeLeft = 30;
         Swal.fire({
-            title: 'استعد للربح!',
-            html: `سيفتح الإعلان الآن. انتظر <b id="timer" style="color:#38bdf8;">${timeLeft}</b> ثانية هنا لاستلام نقاطك.`,
-            showConfirmButton: true,
-            confirmButtonText: 'فتح الإعلان وبدء العداد',
+            title: 'جاري فتح الإعلان...',
+            html: `انتظر <b id="timer" style="color:#38bdf8;">${timeLeft}</b> ثانية لاستلام الربح.`,
+            showConfirmButton: false,
             allowOutsideClick: false,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.open(ADS_URL, '_blank');
+            didOpen: () => {
                 const t = setInterval(async () => {
                     timeLeft--;
                     if(document.getElementById('timer')) document.getElementById('timer').innerText = timeLeft;
                     if(timeLeft <= 0) {
                         clearInterval(t);
                         await updateDoc(doc(db, "users", auth.currentUser.uid), { points: increment(1) });
-                        Swal.fire('أحسنت!', 'تمت إضافة 1 نقطة', 'success').then(()=>location.reload());
+                        Swal.fire('أحسنت!', 'انضافت 1 نقطة', 'success').then(()=>location.reload());
                     }
                 }, 1000);
             }
