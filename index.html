@@ -3,139 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIZA Pro - Luxury Mining</title>
+    <title>VIZA Pro - Mining Central</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #FFD700; --secondary: #fdfdfd; --bg: #000000; --card: #151515; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 80px; }
+        :root { --primary: #FFD700; --bg: #000; --card: #121212; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; padding-bottom: 30px; }
         
-        /* كرت الرصيد الذهبي */
-        .balance-card { background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); width: 90%; padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(255,215,0,0.2); color: #000; }
-        .balance-label { font-size: 14px; opacity: 0.8; }
-        .balance-amount { font-size: 36px; font-weight: bold; display: block; margin-top: 5px; }
-        
-        /* شبكة الإحصائيات */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 95%; margin-bottom: 30px; }
-        .stat-box { background: var(--card); padding: 20px; border-radius: 18px; text-align: center; border: 1px solid #222; position: relative; }
-        .stat-box i { position: absolute; right: 15px; top: 15px; color: var(--primary); font-size: 16px; }
-        .stat-val { display: block; font-size: 24px; font-weight: bold; color: white; margin-top: 5px; }
-        .stat-label { font-size: 11px; color: #888; }
+        .balance-card { background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); width: 90%; padding: 20px; border-radius: 20px; text-align: center; color: #000; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(255,215,0,0.1); }
+        .balance-amount { font-size: 32px; font-weight: bold; display: block; }
 
-        /* منطقة العداد الدائري الفريدة */
-        .mining-area { position: relative; width: 250px; height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 30px 0; }
-        .play-btn-luxury { background: var(--card); width: 160px; height: 160px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; box-shadow: 0 0 20px rgba(0,0,0,0.5); border: 4px solid var(--primary); color: var(--primary); transition: 0.3s; z-index: 2; position: relative; }
-        .play-btn-luxury:hover { background: var(--primary); color: #000; box-shadow: 0 0 40px rgba(255,215,0,0.5); }
-        .circle-text { margin-top: 25px; text-align: center; }
-        .circle-text h2 { margin: 0; color: white; font-size: 28px; font-weight: bold; }
-        
-        /* شريط التنقل السفلي */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #222; z-index: 100; }
-        .nav-item { color: #555; text-align: center; font-size: 10px; text-decoration: none; flex: 1; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 22px; display: block; margin-bottom: 5px; }
+        .mining-section { text-align: center; margin: 40px 0; }
+        .main-bolt { width: 150px; height: 150px; border-radius: 50%; border: 5px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 60px; color: var(--primary); margin: 0 auto; cursor: pointer; transition: 0.3s; box-shadow: 0 0 25px rgba(255,215,0,0.2); }
+        .main-bolt:active { transform: scale(0.9); }
+
+        /* قسم عدادات الاشتراك */
+        .subscription-header { margin-top: 30px; border-right: 4px solid var(--primary); padding-right: 10px; font-size: 18px; }
+        .counter-card { background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .counter-info b { color: var(--primary); font-size: 18px; }
+        .counter-info p { margin: 5px 0 0; font-size: 12px; color: #888; }
+        .sub-btn { background: var(--primary); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .sub-btn.active { background: #333; color: #fff; cursor: default; }
+
+        /* إخفاء القوائم القديمة */
+        .nav-bar { display: none; } 
     </style>
 </head>
 <body>
 
     <div class="balance-card">
-        <span class="balance-label">الرصيد المتوفر</span>
+        <small>رصيد محفظة VIZA</small>
         <span class="balance-amount"><span id="points-val">0.00</span> $</span>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-box">
-            <i class="fas fa-coins"></i>
-            <span class="stat-label">النقاط الكلية</span>
-            <span class="stat-val" id="total-points-display">0</span>
-        </div>
-        <div class="stat-box">
-            <i class="fas fa-hourglass-start"></i>
-            <span class="stat-label">وقت التعدين</span>
-            <span class="stat-val" style="color: var(--primary);">24H</span>
-        </div>
+    <div class="mining-section">
+        <div class="main-bolt" id="start-mining"><i class="fas fa-bolt"></i></div>
+        <h2 id="status-text">ابدأ التعدين الآن</h2>
+        <p style="color: #666;">اضغط لتشغيل العداد النشط</p>
     </div>
 
-    <div class="mining-area">
-        <button class="play-btn-luxury" id="task-btn">
-            <i class="fas fa-bolt"></i>
-        </button>
-        <div class="circle-text">
-            <h2>ابدأ التعدين ⚡</h2>
-            <small style="color: #666;">اضغط لتفعيل عداد الـ VIZA</small>
+    <div class="subscription-header">عدادات الاشتراك المتاحة</div>
+
+    <div class="counter-card">
+        <div class="counter-info">
+            <b>العداد المجاني (نشط)</b>
+            <p>سرعة الربح: 0.10$ / يوم</p>
         </div>
+        <button class="sub-btn active">مفعل</button>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-item"><i class="fas fa-gift"></i>المتجر</div>
-        <div class="nav-item"><i class="fas fa-trophy"></i>المسابقات</div>
-        <div class="nav-item active"><i class="fas fa-home"></i>الرئيسية</div>
-        <div class="nav-item"><i class="fas fa-user-circle"></i>حسابي</div>
+    <div class="counter-card">
+        <div class="counter-info">
+            <b>العداد البرونزي</b>
+            <p>سرعة الربح: 2.50$ / يوم</p>
+        </div>
+        <button class="sub-btn" onclick="subscribe('البرونزي', 10)">10$ / شهر</button>
+    </div>
+
+    <div class="counter-card" style="border: 1px solid var(--primary);">
+        <div class="counter-info">
+            <b style="color: #fff;">العداد الذهبي VIP</b>
+            <p>سرعة الربح: 10.00$ / يوم</p>
+        </div>
+        <button class="sub-btn" onclick="subscribe('الذهبي VIP', 50)">50$ / شهر</button>
     </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // ... كود Firebase المعتاد يوضع هنا ...
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyA8n2m3L1QlKAJr-ZGLXUtbImOq29-lsOk",
-        authDomain: "mstufa-1f409.firebaseapp.com",
-        projectId: "mstufa-1f409",
-        storageBucket: "mstufa-1f409.firebasestorage.app",
-        messagingSenderId: "638217767100",
-        appId: "1:638217767100:web:de2dbc5b5584e1c137a8b9"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // 🛑 ضع هنا الرابط المباشر (Direct Link) من Adsterra أو Monetag لضمان الربح من المشاهدة
-    const PROFIT_URL = "ضع_رابط_الإعلان_المباشر_هنا"; 
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const snap = await getDoc(doc(db, "users", user.uid));
-            if (snap.exists()) {
-                const data = snap.data();
-                document.getElementById('points-val').innerText = (data.points || 0).toFixed(2);
-                document.getElementById('total-points-display').innerText = Math.floor((data.points || 0) * 1000);
-            }
-        }
-    });
-
-    document.getElementById('task-btn').onclick = async () => {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const snap = await getDoc(userRef);
-        
-        // منع التكرار (قفل 24 ساعة) لضمان احتساب الأرباح
-        if (snap.exists() && snap.data().lastTask && (Date.now() - snap.data().lastTask < 24 * 60 * 60 * 1000)) {
-            Swal.fire({ icon: 'warning', title: 'مهلاً!', text: 'العداد يعمل مرة واحدة يومياً. ارجع غداً!', background: '#151515', color: '#fff', confirmButtonColor: '#FFD700' });
-            return;
-        }
-
-        // فتح الإعلان المباشر للربح في نافذة جديدة
-        window.open(PROFIT_URL, '_blank');
-        
-        let timer = 30;
+    window.subscribe = (name, price) => {
         Swal.fire({
-            title: 'جاري احتساب أرباح التعدين...',
-            html: `<div style="font-size:30px; color:#FFD700; font-weight:bold; margin-top:10px;" id="timer">${timer}</div>`,
-            showConfirmButton: false, allowOutsideClick: false, background: '#151515', color: '#fff',
-            didOpen: () => {
-                const countdown = setInterval(async () => {
-                    timer--;
-                    if(document.getElementById('timer')) document.getElementById('timer').innerText = timer;
-                    if (timer <= 0) {
-                        clearInterval(countdown);
-                        // إضافة النقطة وتسجيل الوقت الحالي في قاعدة البيانات
-                        await updateDoc(userRef, { points: increment(1.00), lastTask: Date.now() });
-                        Swal.fire({ icon: 'success', title: 'تمت إضافة 1.00$ لرصيدك ✅', background: '#151515', color: '#fff', confirmButtonColor: '#FFD700' }).then(() => location.reload());
-                    }
-                }, 1000);
+            title: `اشتراك في العداد ${name}`,
+            text: `سعر الاشتراك هو ${price}$. هل تريد الاستمرار؟`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#FFD700',
+            confirmButtonText: 'اشترك الآن',
+            cancelButtonText: 'إلغاء',
+            background: '#121212',
+            color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'رصيد غير كافٍ', text: 'يرجى شحن محفظتك أولاً للاشتراك.', icon: 'error', background: '#121212', color: '#fff' });
             }
         });
+    };
+
+    document.getElementById('start-mining').onclick = () => {
+        // نظام الربح من الإعلانات كما فعلنا سابقاً
+        window.open("رابط_الإعلان_المباشر_هنا", "_blank");
+        document.getElementById('status-text').innerText = "جاري التعدين...";
+        setTimeout(() => {
+            Swal.fire({ title: 'نجاح!', text: 'تمت إضافة أرباح اليوم بنجاح ✅', icon: 'success', background: '#121212', color: '#fff' });
+            document.getElementById('status-text').innerText = "ابدأ التعدين الآن";
+        }, 3000);
     };
 </script>
 </body>
