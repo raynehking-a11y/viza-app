@@ -1,46 +1,103 @@
-    <div class="subscription-header">شحن رصيد المحفظة</div>
-    <div style="display: flex; gap: 10px; width: 95%; margin-top: 15px;">
-        <div class="stat-box" onclick="deposit('MasterCard')" style="cursor:pointer; flex:1; border:1px solid #eb001b;">
-            <i class="fab fa-cc-mastercard" style="color: #eb001b; font-size: 24px;"></i>
-            <span class="stat-label" style="margin-top:10px; display:block;">MasterCard</span>
-        </div>
-        <div class="stat-box" onclick="deposit('OKX')" style="cursor:pointer; flex:1; border:1px solid #ffffff;">
-            <i class="fas fa-wallet" style="color: #fff; font-size: 24px;"></i>
-            <span class="stat-label" style="margin-top:10px; display:block;">OKX Wallet</span>
-        </div>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIZA Pro Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #FFD700; --bg: #000; --card: #121212; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; padding-bottom: 50px; }
+        
+        .balance-card { background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); width: 90%; padding: 25px; border-radius: 20px; text-align: center; color: #000; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(255,215,0,0.2); }
+        .balance-amount { font-size: 34px; font-weight: bold; display: block; }
+
+        .mining-section { text-align: center; margin: 30px 0; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #222; }
+        .main-bolt { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 50px; color: var(--primary); margin: 0 auto 15px; cursor: pointer; box-shadow: 0 0 20px rgba(255,215,0,0.1); }
+
+        .section-title { margin-top: 25px; border-right: 4px solid var(--primary); padding-right: 10px; font-size: 18px; font-weight: bold; }
+        
+        .item-card { background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 15px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .sub-btn { background: var(--primary); color: #000; border: none; padding: 10px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        .payment-grid { display: flex; gap: 10px; margin-top: 15px; }
+        .pay-box { background: var(--card); flex: 1; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #333; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="balance-card">
+        <small>إجمالي الرصيد المتوفر</small>
+        <span class="balance-amount"><span id="points-val">0.00</span> $</span>
     </div>
 
-<script type="module">
-    // ... (أكواد Firebase والاشتراكات السابقة) ...
+    <div class="mining-section">
+        <div class="main-bolt" id="start-mining"><i class="fas fa-bolt"></i></div>
+        <h3 id="status-text">ابدأ التعدين اليومي</h3>
+        <small style="color: #888;">اضغط لتشغيل العداد وجمع الأرباح</small>
+    </div>
 
-    window.deposit = (method) => {
+    <div class="section-title">شحن المحفظة (MasterCard / OKX)</div>
+    <div class="payment-grid">
+        <div class="pay-box" onclick="pay('MasterCard', '💳')"><i class="fab fa-cc-mastercard" style="color:#eb001b"></i><br>MasterCard</div>
+        <div class="pay-box" onclick="pay('OKX Wallet', '🔗')"><i class="fas fa-wallet"></i><br>OKX</div>
+    </div>
+
+    <div class="section-title">خطط الاشتراكات</div>
+    
+    <div class="item-card">
+        <div><b>🥉 الاشتراك الأول</b><br><small>السعر: 25$ | الربح: 0.80$</small></div>
+        <button class="sub-btn" onclick="sub('الأول', 25)">تفعيل</button>
+    </div>
+
+    <div class="item-card">
+        <div><b>🥈 الاشتراك الثاني</b><br><small>السعر: 100$ | الربح: 2.50$</small></div>
+        <button class="sub-btn" onclick="sub('الثاني', 100)">تفعيل</button>
+    </div>
+
+    <div class="item-card" style="border-color: var(--primary)">
+        <div><b style="color:var(--primary)">🥇 الاشتراك الثالث VIP</b><br><small>السعر: 200$ | الربح: 6.50$</small></div>
+        <button class="sub-btn" onclick="sub('الثالث VIP', 200)">تفعيل</button>
+    </div>
+
+<script>
+    // وظيفة الشحن
+    window.pay = (method, icon) => {
         Swal.fire({
-            title: `شحن عبر ${method}`,
-            html: `أدخل المبلغ الذي تريد شحنه ($):<br><br>
-                   <input type="number" id="deposit-amount" class="swal2-input" placeholder="0.00" style="color:#000">`,
+            title: `${icon} شحن عبر ${method}`,
+            input: 'number',
+            inputPlaceholder: 'أدخل المبلغ بالدولار',
             showCancelButton: true,
-            confirmButtonText: 'طلب شحن',
-            cancelButtonText: 'إلغاء',
-            background: '#121212',
-            color: '#fff',
-            preConfirm: () => {
-                const amount = document.getElementById('deposit-amount').value;
-                if (!amount || amount <= 0) {
-                    Swal.showValidationMessage('يرجى إدخال مبلغ صالح');
-                }
-                return amount;
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'تم إرسال الطلب',
-                    text: `يرجى التواصل مع الإدارة لإتمام عملية الدفع عبر ${method}. المبلغ: ${result.value}$`,
-                    icon: 'success',
-                    background: '#121212',
-                    color: '#fff'
-                });
-                // هنا يمكنك ربط الطلب بـ Firebase ليصلك إشعار في لوحة التحكم
-            }
+            confirmButtonText: 'إرسال الطلب',
+            background: '#121212', color: '#fff', confirmButtonColor: '#FFD700'
+        }).then((res) => {
+            if(res.isConfirmed) Swal.fire('تم الإرسال', 'سيتم مراجعة طلبك من قبل الإدارة', 'success');
         });
     };
+
+    // وظيفة الاشتراك
+    window.sub = (name, price) => {
+        Swal.fire({
+            title: `تفعيل خطة ${name}`,
+            text: `هل تريد دفع ${price}$ لتفعيل هذا العداد؟`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'نعم، تفعيل',
+            background: '#121212', color: '#fff', confirmButtonColor: '#FFD700'
+        }).then((res) => {
+            if(res.isConfirmed) Swal.fire('رصيد غير كافٍ', 'يرجى شحن المحفظة أولاً', 'error');
+        });
+    };
+
+    // وظيفة التعدين
+    document.getElementById('start-mining').onclick = () => {
+        document.getElementById('status-text').innerText = "جاري الاتصال بالخادم...";
+        setTimeout(() => {
+            Swal.fire({ title: 'تم التعدين ✅', text: 'انتظر معالجة أرباحك خلال 24 ساعة', icon: 'success', background: '#121212', color: '#fff' });
+            document.getElementById('status-text').innerText = "ابدأ التعدين اليومي";
+        }, 2000);
+    };
 </script>
+</body>
+</html>
