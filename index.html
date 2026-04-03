@@ -1,103 +1,46 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIZA Pro - Mining Central</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --primary: #FFD700; --bg: #000; --card: #121212; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; padding-bottom: 30px; }
-        
-        .balance-card { background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); width: 90%; padding: 20px; border-radius: 20px; text-align: center; color: #000; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(255,215,0,0.1); }
-        .balance-amount { font-size: 32px; font-weight: bold; display: block; }
-
-        .mining-section { text-align: center; margin: 40px 0; }
-        .main-bolt { width: 150px; height: 150px; border-radius: 50%; border: 5px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 60px; color: var(--primary); margin: 0 auto; cursor: pointer; transition: 0.3s; box-shadow: 0 0 25px rgba(255,215,0,0.2); }
-        .main-bolt:active { transform: scale(0.9); }
-
-        /* قسم عدادات الاشتراك */
-        .subscription-header { margin-top: 30px; border-right: 4px solid var(--primary); padding-right: 10px; font-size: 18px; }
-        .counter-card { background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .counter-info b { color: var(--primary); font-size: 18px; }
-        .counter-info p { margin: 5px 0 0; font-size: 12px; color: #888; }
-        .sub-btn { background: var(--primary); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .sub-btn.active { background: #333; color: #fff; cursor: default; }
-
-        /* إخفاء القوائم القديمة */
-        .nav-bar { display: none; } 
-    </style>
-</head>
-<body>
-
-    <div class="balance-card">
-        <small>رصيد محفظة VIZA</small>
-        <span class="balance-amount"><span id="points-val">0.00</span> $</span>
-    </div>
-
-    <div class="mining-section">
-        <div class="main-bolt" id="start-mining"><i class="fas fa-bolt"></i></div>
-        <h2 id="status-text">ابدأ التعدين الآن</h2>
-        <p style="color: #666;">اضغط لتشغيل العداد النشط</p>
-    </div>
-
-    <div class="subscription-header">عدادات الاشتراك المتاحة</div>
-
-    <div class="counter-card">
-        <div class="counter-info">
-            <b>العداد المجاني (نشط)</b>
-            <p>سرعة الربح: 0.10$ / يوم</p>
+    <div class="subscription-header">شحن رصيد المحفظة</div>
+    <div style="display: flex; gap: 10px; width: 95%; margin-top: 15px;">
+        <div class="stat-box" onclick="deposit('MasterCard')" style="cursor:pointer; flex:1; border:1px solid #eb001b;">
+            <i class="fab fa-cc-mastercard" style="color: #eb001b; font-size: 24px;"></i>
+            <span class="stat-label" style="margin-top:10px; display:block;">MasterCard</span>
         </div>
-        <button class="sub-btn active">مفعل</button>
-    </div>
-
-    <div class="counter-card">
-        <div class="counter-info">
-            <b>العداد البرونزي</b>
-            <p>سرعة الربح: 2.50$ / يوم</p>
+        <div class="stat-box" onclick="deposit('OKX')" style="cursor:pointer; flex:1; border:1px solid #ffffff;">
+            <i class="fas fa-wallet" style="color: #fff; font-size: 24px;"></i>
+            <span class="stat-label" style="margin-top:10px; display:block;">OKX Wallet</span>
         </div>
-        <button class="sub-btn" onclick="subscribe('البرونزي', 10)">10$ / شهر</button>
-    </div>
-
-    <div class="counter-card" style="border: 1px solid var(--primary);">
-        <div class="counter-info">
-            <b style="color: #fff;">العداد الذهبي VIP</b>
-            <p>سرعة الربح: 10.00$ / يوم</p>
-        </div>
-        <button class="sub-btn" onclick="subscribe('الذهبي VIP', 50)">50$ / شهر</button>
     </div>
 
 <script type="module">
-    // ... كود Firebase المعتاد يوضع هنا ...
+    // ... (أكواد Firebase والاشتراكات السابقة) ...
 
-    window.subscribe = (name, price) => {
+    window.deposit = (method) => {
         Swal.fire({
-            title: `اشتراك في العداد ${name}`,
-            text: `سعر الاشتراك هو ${price}$. هل تريد الاستمرار؟`,
-            icon: 'info',
+            title: `شحن عبر ${method}`,
+            html: `أدخل المبلغ الذي تريد شحنه ($):<br><br>
+                   <input type="number" id="deposit-amount" class="swal2-input" placeholder="0.00" style="color:#000">`,
             showCancelButton: true,
-            confirmButtonColor: '#FFD700',
-            confirmButtonText: 'اشترك الآن',
+            confirmButtonText: 'طلب شحن',
             cancelButtonText: 'إلغاء',
             background: '#121212',
-            color: '#fff'
+            color: '#fff',
+            preConfirm: () => {
+                const amount = document.getElementById('deposit-amount').value;
+                if (!amount || amount <= 0) {
+                    Swal.showValidationMessage('يرجى إدخال مبلغ صالح');
+                }
+                return amount;
+            }
         }).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire({ title: 'رصيد غير كافٍ', text: 'يرجى شحن محفظتك أولاً للاشتراك.', icon: 'error', background: '#121212', color: '#fff' });
+                Swal.fire({
+                    title: 'تم إرسال الطلب',
+                    text: `يرجى التواصل مع الإدارة لإتمام عملية الدفع عبر ${method}. المبلغ: ${result.value}$`,
+                    icon: 'success',
+                    background: '#121212',
+                    color: '#fff'
+                });
+                // هنا يمكنك ربط الطلب بـ Firebase ليصلك إشعار في لوحة التحكم
             }
         });
     };
-
-    document.getElementById('start-mining').onclick = () => {
-        // نظام الربح من الإعلانات كما فعلنا سابقاً
-        window.open("رابط_الإعلان_المباشر_هنا", "_blank");
-        document.getElementById('status-text').innerText = "جاري التعدين...";
-        setTimeout(() => {
-            Swal.fire({ title: 'نجاح!', text: 'تمت إضافة أرباح اليوم بنجاح ✅', icon: 'success', background: '#121212', color: '#fff' });
-            document.getElementById('status-text').innerText = "ابدأ التعدين الآن";
-        }, 3000);
-    };
 </script>
-</body>
-</html>
