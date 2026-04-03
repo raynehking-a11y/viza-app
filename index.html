@@ -62,18 +62,41 @@
     </div>
 
 <script>
-    // وظيفة الشحن
+    // وظيفة الشحن المعدلة لتدعم OKX بالعراق
     window.pay = (method, icon) => {
-        Swal.fire({
-            title: `${icon} شحن عبر ${method}`,
-            input: 'number',
-            inputPlaceholder: 'أدخل المبلغ بالدولار',
-            showCancelButton: true,
-            confirmButtonText: 'إرسال الطلب',
-            background: '#121212', color: '#fff', confirmButtonColor: '#FFD700'
-        }).then((res) => {
-            if(res.isConfirmed) Swal.fire('تم الإرسال', 'سيتم مراجعة طلبك من قبل الإدارة', 'success');
-        });
+        if (method === 'OKX Wallet') {
+            // شاشة شحن OKX الخاصة بصوفي
+            Swal.fire({
+                title: 'إيداع عبر USDT (TRC20)',
+                html: `
+                    <div style="background:#000; padding:10px; border-radius:10px; border:1px dashed #FFD700; color:#fff; word-break:break-all; font-size:13px;" id="walletAddr">TVUgAnNKobzFKxuBRUiBUddULce5CK6g8q</div>
+                    <button onclick="copyAddr()" style="margin-top:10px; background:#FFD700; border:none; padding:5px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">نسخ العنوان</button>
+                    <p style="font-size:12px; color:#aaa; margin-top:15px;">بعد التحويل، أرسل سكرين شوت للإدارة لتفعيل الرصيد.</p>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'إرسال تأكيد التحويل',
+                background: '#121212', color: '#fff', confirmButtonColor: '#FFD700'
+            });
+        } else {
+            // شحن الماستر كارد العادي
+            Swal.fire({
+                title: `${icon} شحن عبر ${method}`,
+                input: 'number',
+                inputPlaceholder: 'أدخل المبلغ بالدولار',
+                showCancelButton: true,
+                confirmButtonText: 'إرسال الطلب',
+                background: '#121212', color: '#fff', confirmButtonColor: '#FFD700'
+            }).then((res) => {
+                if(res.isConfirmed) Swal.fire('تم الإرسال', 'سيتم مراجعة طلبك من قبل الإدارة', 'success');
+            });
+        }
+    };
+
+    // دالة نسخ العنوان
+    window.copyAddr = () => {
+        const addr = "TVUgAnNKobzFKxuBRUiBUddULce5CK6g8q";
+        navigator.clipboard.writeText(addr);
+        Swal.showValidationMessage('✅ تم نسخ العنوان!');
     };
 
     // وظيفة الاشتراك
