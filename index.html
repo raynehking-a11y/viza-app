@@ -3,41 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIZA Hub Pro</title>
+    <title>VIZA Pro Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #00ff88; --secondary: #ff9f0a; --bg: #050a0e; --card: #101820; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 80px; }
         
-        /* كرت الرصيد العلوي */
-        .balance-card { background: var(--card); width: 90%; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; border-bottom: 3px solid var(--primary); }
+        .balance-card { background: var(--card); width: 90%; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; border-bottom: 3px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .balance-amount { font-size: 32px; font-weight: bold; color: var(--primary); display: block; }
         
-        /* شبكة المعلومات */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 95%; margin-bottom: 30px; }
-        .stat-box { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-box i { position: absolute; left: 10px; top: 10px; color: var(--secondary); font-size: 14px; }
-        .stat-val { display: block; font-size: 22px; font-weight: bold; margin-top: 5px; }
+        .stat-box { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-val { display: block; font-size: 22px; font-weight: bold; color: white; }
         .stat-label { font-size: 11px; color: #888; }
 
-        /* العداد الدائري الكبير */
-        .main-circle-area { position: relative; width: 220px; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0; }
-        .outer-ring { position: absolute; width: 100%; height: 100%; border: 2px solid rgba(0,255,136,0.1); border-radius: 50%; }
-        .play-btn { background: linear-gradient(135deg, #00ff88, #008855); width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; box-shadow: 0 0 30px rgba(0,255,136,0.3); transition: 0.3s; z-index: 2; }
-        .play-btn:active { transform: scale(0.9); }
-        .circle-text { margin-top: 15px; text-align: center; z-index: 2; }
-        .circle-text h2 { margin: 0; color: var(--primary); font-size: 28px; }
+        .main-circle-area { position: relative; width: 230px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0; }
+        .play-btn { background: radial-gradient(circle, #00ff88 0%, #008855 100%); width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; box-shadow: 0 0 40px rgba(0,255,136,0.4); transition: 0.3s; z-index: 2; border: none; color: white; }
+        .play-btn:hover { transform: scale(1.05); }
+        .circle-text { margin-top: 20px; text-align: center; }
+        .circle-text h2 { margin: 0; color: var(--primary); font-size: 26px; }
         
-        /* زر الترقية البرتقالي */
-        .upgrade-btn { background: linear-gradient(90deg, #ff9f0a, #ff6b00); width: 95%; padding: 18px; border-radius: 40px; border: none; color: white; font-weight: bold; font-size: 16px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; }
+        .upgrade-btn { background: linear-gradient(90deg, #ff9f0a, #ff6b00); width: 95%; padding: 15px 25px; border-radius: 40px; border: none; color: white; font-weight: bold; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
 
-        /* شريط التنقل السفلي */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.1); }
-        .nav-item { color: #555; text-align: center; font-size: 10px; text-decoration: none; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.1); z-index: 100; }
+        .nav-item { color: #64748b; text-align: center; font-size: 10px; text-decoration: none; flex: 1; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
-        .center-nav { background: var(--primary); color: white !important; width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-top: -30px; box-shadow: 0 5px 15px rgba(0,255,136,0.4); }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+        .center-nav { background: var(--primary); color: white !important; width: 55px; height: 55px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin-top: -35px; box-shadow: 0 8px 20px rgba(0,255,136,0.4); }
     </style>
 </head>
 <body>
@@ -49,39 +42,37 @@
 
     <div class="stats-grid">
         <div class="stat-box">
-            <i class="fas fa-tachometer-alt"></i>
             <span class="stat-label">عداد النقاط</span>
-            <span class="stat-val" style="color: var(--secondary);">25</span>
+            <span class="stat-val" style="color: var(--secondary);" id="daily-count">25</span>
         </div>
         <div class="stat-box">
-            <i class="fas fa-database"></i>
             <span class="stat-label">مجموع النقاط</span>
-            <span class="stat-val">4774642</span>
+            <span class="stat-val" id="total-points-display">0</span>
         </div>
     </div>
 
     <div class="main-circle-area">
-        <div class="outer-ring"></div>
-        <div class="play-btn" id="task-btn">
-            <i class="fas fa-play"></i>
-        </div>
+        <button class="play-btn" id="task-btn"><i class="fas fa-play"></i></button>
         <div class="circle-text">
             <h2>ابدأ الآن</h2>
-            <small style="color: #666;">اضغط لتشغيل العداد</small>
+            <small style="color: #666;">اضغط لتشغيل العداد والربح</small>
         </div>
     </div>
 
-    <button class="upgrade-btn" onclick="Swal.fire('قريباً', 'ميزة ترقية العداد ستتوفر في التحديث القادم', 'info')">
+    <button class="upgrade-btn" id="upgrade-logic">
         <i class="fas fa-chevron-left"></i>
-        <span>ترقية العداد <br> <small>ضاعف أرباحك اليومية ⚡</small></span>
+        <div style="text-align: right;">
+            <span>ترقية العداد</span><br>
+            <small>ضاعف أرباحك اليومية ⚡</small>
+        </div>
     </button>
 
     <div class="nav-bar">
-        <a href="#" class="nav-item"><i class="fas fa-user"></i>حسابي</a>
-        <a href="#" class="nav-item"><i class="fas fa-ticket-alt"></i>اليانصيب</a>
-        <a href="#" class="nav-item center-nav"><i class="fas fa-th-large"></i></a>
-        <a href="#" class="nav-item"><i class="fas fa-store"></i>المتجر</a>
-        <a href="#" class="nav-item active"><i class="fas fa-clock"></i>العدادات</a>
+        <div class="nav-item" id="nav-profile"><i class="fas fa-user"></i>حسابي</div>
+        <div class="nav-item" id="nav-lotto"><i class="fas fa-ticket-alt"></i>اليانصيب</div>
+        <div class="nav-item center-nav"><i class="fas fa-th-large"></i></div>
+        <div class="nav-item" id="nav-store"><i class="fas fa-store"></i>المتجر</div>
+        <div class="nav-item active"><i class="fas fa-clock"></i>العدادات</div>
     </div>
 
 <script type="module">
@@ -102,50 +93,52 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // حط هنا رابط الـ Direct Link الخاص بك من Adsterra (نوع CPM)
     const AD_URL = "https://shrinkme.click/jkhs"; 
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const snap = await getDoc(doc(db, "users", user.uid));
             if (snap.exists()) {
-                document.getElementById('points-val').innerText = snap.data().points.toFixed(2);
+                const data = snap.data();
+                document.getElementById('points-val').innerText = (data.points || 0).toFixed(2);
+                document.getElementById('total-points-display').innerText = Math.floor((data.points || 0) * 1000);
             }
         }
     });
 
+    // تشغيل العداد والمهمة
     document.getElementById('task-btn').onclick = async () => {
         const userRef = doc(db, "users", auth.currentUser.uid);
         const snap = await getDoc(userRef);
-        
         if (snap.exists() && snap.data().lastTask && (Date.now() - snap.data().lastTask < 24 * 60 * 60 * 1000)) {
-            Swal.fire('عذراً!', 'العداد يعمل مرة واحدة يومياً. ارجع باجر!', 'warning');
+            Swal.fire({ icon: 'warning', title: 'مهلاً!', text: 'العداد يعمل مرة واحدة كل 24 ساعة.', background: '#101820', color: '#fff' });
             return;
         }
-
         window.open(AD_URL, '_blank');
-        
         let timer = 30;
         Swal.fire({
-            title: 'جاري تشغيل العداد...',
-            html: `<div style="font-size:30px; color:#00ff88; font-weight:bold;" id="timer">${timer}</div>`,
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            background: '#101820',
-            color: '#fff',
+            title: 'جاري الشحن...',
+            html: `<b id="count" style="font-size:30px;color:var(--primary)">${timer}</b>`,
+            showConfirmButton: false, allowOutsideClick: false, background: '#101820', color: '#fff',
             didOpen: () => {
-                const interval = setInterval(async () => {
+                const inv = setInterval(async () => {
                     timer--;
-                    if(document.getElementById('timer')) document.getElementById('timer').innerText = timer;
-                    if (timer <= 0) {
-                        clearInterval(interval);
+                    if(document.getElementById('count')) document.getElementById('count').innerText = timer;
+                    if(timer <= 0){
+                        clearInterval(inv);
                         await updateDoc(userRef, { points: increment(1.00), lastTask: Date.now() });
-                        Swal.fire('نجاح', 'تم الشحن بنجاح ✅', 'success').then(()=>location.reload());
+                        Swal.fire({ icon: 'success', title: 'تم الشحن بنجاح ✅', background: '#101820', color: '#fff' }).then(()=>location.reload());
                     }
                 }, 1000);
             }
         });
     };
+
+    // تفعيل أزرار القائمة السفلية
+    document.getElementById('nav-store').onclick = () => Swal.fire({ title: 'المتجر', text: 'سيتم افتتاح المتجر قريباً لشراء الجوائز!', icon: 'info', background: '#101820', color: '#fff' });
+    document.getElementById('nav-lotto').onclick = () => Swal.fire({ title: 'اليانصيب', text: 'اشترك الآن في السحب الأسبوعي على 100 دولار!', icon: 'warning', background: '#101820', color: '#fff' });
+    document.getElementById('nav-profile').onclick = () => Swal.fire({ title: 'حسابي', html: `معرفك: ${auth.currentUser.uid.substring(0,8)}<br>الرصيد جاهز للسحب!`, icon: 'user', background: '#101820', color: '#fff' });
+    document.getElementById('upgrade-logic').onclick = () => Swal.fire({ title: 'ترقية العداد', text: 'قم بدعوة 5 أصدقاء لتفعيل ميزة مضاعفة الأرباح!', icon: 'bolt', background: '#101820', color: '#fff' });
 </script>
 </body>
 </html>
