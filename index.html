@@ -10,24 +10,27 @@
         :root { --primary: #00ff88; --secondary: #ff9f0a; --bg: #050a0e; --card: #101820; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 80px; }
         
-        .balance-card { background: var(--card); width: 90%; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; border-bottom: 3px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        /* واجهة تسجيل الدخول */
+        #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; width: 100%; text-align: center; }
+        .login-input { background: var(--card); border: 1px solid #333; padding: 15px; border-radius: 15px; color: white; width: 85%; margin-bottom: 10px; outline: none; }
+        .login-btn { background: var(--primary); color: black; border: none; padding: 15px; border-radius: 15px; width: 90%; font-weight: bold; cursor: pointer; }
+
+        /* واجهة التطبيق الرئيسية */
+        #main-app { display: none; width: 100%; flex-direction: column; align-items: center; }
+        .balance-card { background: var(--card); width: 90%; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; border-bottom: 3px solid var(--primary); }
         .balance-amount { font-size: 32px; font-weight: bold; color: var(--primary); display: block; }
         
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 95%; margin-bottom: 30px; }
         .stat-box { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .stat-val { display: block; font-size: 22px; font-weight: bold; color: white; }
-        .stat-label { font-size: 11px; color: #888; }
 
         .main-circle-area { position: relative; width: 230px; height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0; }
-        .play-btn { background: radial-gradient(circle, #00ff88 0%, #008855 100%); width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; box-shadow: 0 0 40px rgba(0,255,136,0.4); transition: 0.3s; z-index: 2; border: none; color: white; }
-        .play-btn:hover { transform: scale(1.05); }
-        .circle-text { margin-top: 20px; text-align: center; }
-        .circle-text h2 { margin: 0; color: var(--primary); font-size: 26px; }
+        .play-btn { background: radial-gradient(circle, #00ff88 0%, #008855 100%); width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; box-shadow: 0 0 40px rgba(0,255,136,0.4); border: none; color: white; }
         
         .upgrade-btn { background: linear-gradient(90deg, #ff9f0a, #ff6b00); width: 95%; padding: 15px 25px; border-radius: 40px; border: none; color: white; font-weight: bold; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
 
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.1); z-index: 100; }
-        .nav-item { color: #64748b; text-align: center; font-size: 10px; text-decoration: none; flex: 1; cursor: pointer; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.1); }
+        .nav-item { color: #64748b; text-align: center; font-size: 10px; flex: 1; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
         .center-nav { background: var(--primary); color: white !important; width: 55px; height: 55px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin-top: -35px; box-shadow: 0 8px 20px rgba(0,255,136,0.4); }
@@ -35,50 +38,60 @@
 </head>
 <body>
 
-    <div class="balance-card">
-        <small>إجمالي الرصيد</small>
-        <span class="balance-amount"><span id="points-val">0.00</span> دولار</span>
+    <div id="login-screen">
+        <h1 style="color:var(--primary)">VIZA PRO</h1>
+        <p>سجل دخولك لبدء الربح</p>
+        <input type="email" id="email" class="login-input" placeholder="البريد الإلكتروني">
+        <input type="password" id="pass" class="login-input" placeholder="كلمة المرور">
+        <button class="login-btn" id="login-trigger">تسجيل الدخول / إنشاء حساب</button>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-box">
-            <span class="stat-label">عداد النقاط</span>
-            <span class="stat-val" style="color: var(--secondary);" id="daily-count">25</span>
+    <div id="main-app">
+        <div class="balance-card">
+            <small>إجمالي الرصيد</small>
+            <span class="balance-amount"><span id="points-val">0.00</span> دولار</span>
         </div>
-        <div class="stat-box">
-            <span class="stat-label">مجموع النقاط</span>
-            <span class="stat-val" id="total-points-display">0</span>
-        </div>
-    </div>
 
-    <div class="main-circle-area">
-        <button class="play-btn" id="task-btn"><i class="fas fa-play"></i></button>
-        <div class="circle-text">
-            <h2>ابدأ الآن</h2>
-            <small style="color: #666;">اضغط لتشغيل العداد والربح</small>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-label">عداد النقاط</span>
+                <span class="stat-val" style="color: var(--secondary);">25</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">مجموع النقاط</span>
+                <span class="stat-val" id="total-points-display">0</span>
+            </div>
         </div>
-    </div>
 
-    <button class="upgrade-btn" id="upgrade-logic">
-        <i class="fas fa-chevron-left"></i>
-        <div style="text-align: right;">
-            <span>ترقية العداد</span><br>
-            <small>ضاعف أرباحك اليومية ⚡</small>
+        <div class="main-circle-area">
+            <button class="play-btn" id="task-btn"><i class="fas fa-play"></i></button>
+            <div class="circle-text" style="margin-top:15px; text-align:center;">
+                <h2>ابدأ الآن</h2>
+                <small style="color: #666;">اضغط لتشغيل العداد والربح</small>
+            </div>
         </div>
-    </button>
 
-    <div class="nav-bar">
-        <div class="nav-item" id="nav-profile"><i class="fas fa-user"></i>حسابي</div>
-        <div class="nav-item" id="nav-lotto"><i class="fas fa-ticket-alt"></i>اليانصيب</div>
-        <div class="nav-item center-nav"><i class="fas fa-th-large"></i></div>
-        <div class="nav-item" id="nav-store"><i class="fas fa-store"></i>المتجر</div>
-        <div class="nav-item active"><i class="fas fa-clock"></i>العدادات</div>
+        <button class="upgrade-btn" id="upgrade-logic">
+            <i class="fas fa-chevron-left"></i>
+            <div style="text-align: right;">
+                <span>ترقية العداد</span><br>
+                <small>ضاعف أرباحك اليومية ⚡</small>
+            </div>
+        </button>
+
+        <div class="nav-bar">
+            <div class="nav-item" id="nav-profile"><i class="fas fa-user"></i>حسابي</div>
+            <div class="nav-item" id="nav-lotto"><i class="fas fa-ticket-alt"></i>اليانصيب</div>
+            <div class="nav-item center-nav"><i class="fas fa-th-large"></i></div>
+            <div class="nav-item" id="nav-store"><i class="fas fa-store"></i>المتجر</div>
+            <div class="nav-item active"><i class="fas fa-clock"></i>العدادات</div>
+        </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyA8n2m3L1QlKAJr-ZGLXUtbImOq29-lsOk",
@@ -95,24 +108,43 @@
 
     const AD_URL = "https://shrinkme.click/jkhs"; 
 
+    // منطق تسجيل الدخول
+    document.getElementById('login-trigger').onclick = async () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        if(!email || !pass) return Swal.fire('خطأ', 'املأ البيانات', 'error');
+        
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch (e) {
+            try {
+                const res = await createUserWithEmailAndPassword(auth, email, pass);
+                await setDoc(doc(db, "users", res.user.uid), { points: 0, lastTask: 0 });
+            } catch (err) { Swal.fire('خطأ', err.message, 'error'); }
+        }
+    };
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
             const snap = await getDoc(doc(db, "users", user.uid));
             if (snap.exists()) {
-                const data = snap.data();
-                document.getElementById('points-val').innerText = (data.points || 0).toFixed(2);
-                document.getElementById('total-points-display').innerText = Math.floor((data.points || 0) * 1000);
+                const p = snap.data().points || 0;
+                document.getElementById('points-val').innerText = p.toFixed(2);
+                document.getElementById('total-points-display').innerText = Math.floor(p * 1000);
             }
+        } else {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
         }
     });
 
-    // تشغيل العداد والمهمة
     document.getElementById('task-btn').onclick = async () => {
         const userRef = doc(db, "users", auth.currentUser.uid);
         const snap = await getDoc(userRef);
         if (snap.exists() && snap.data().lastTask && (Date.now() - snap.data().lastTask < 24 * 60 * 60 * 1000)) {
-            Swal.fire({ icon: 'warning', title: 'مهلاً!', text: 'العداد يعمل مرة واحدة كل 24 ساعة.', background: '#101820', color: '#fff' });
-            return;
+            return Swal.fire('مهلاً', 'العداد يعمل مرة يومياً', 'warning');
         }
         window.open(AD_URL, '_blank');
         let timer = 30;
@@ -127,18 +159,29 @@
                     if(timer <= 0){
                         clearInterval(inv);
                         await updateDoc(userRef, { points: increment(1.00), lastTask: Date.now() });
-                        Swal.fire({ icon: 'success', title: 'تم الشحن بنجاح ✅', background: '#101820', color: '#fff' }).then(()=>location.reload());
+                        Swal.fire('نجاح', 'تم الشحن ✅', 'success').then(()=>location.reload());
                     }
                 }, 1000);
             }
         });
     };
 
-    // تفعيل أزرار القائمة السفلية
-    document.getElementById('nav-store').onclick = () => Swal.fire({ title: 'المتجر', text: 'سيتم افتتاح المتجر قريباً لشراء الجوائز!', icon: 'info', background: '#101820', color: '#fff' });
-    document.getElementById('nav-lotto').onclick = () => Swal.fire({ title: 'اليانصيب', text: 'اشترك الآن في السحب الأسبوعي على 100 دولار!', icon: 'warning', background: '#101820', color: '#fff' });
-    document.getElementById('nav-profile').onclick = () => Swal.fire({ title: 'حسابي', html: `معرفك: ${auth.currentUser.uid.substring(0,8)}<br>الرصيد جاهز للسحب!`, icon: 'user', background: '#101820', color: '#fff' });
-    document.getElementById('upgrade-logic').onclick = () => Swal.fire({ title: 'ترقية العداد', text: 'قم بدعوة 5 أصدقاء لتفعيل ميزة مضاعفة الأرباح!', icon: 'bolt', background: '#101820', color: '#fff' });
+    // قسم حسابي مع تسجيل الخروج
+    document.getElementById('nav-profile').onclick = () => {
+        Swal.fire({
+            title: 'حسابي',
+            html: `المعرف: ${auth.currentUser.uid.substring(0,8)}`,
+            showCancelButton: true,
+            confirmButtonText: 'تسجيل الخروج',
+            cancelButtonText: 'رجوع',
+            confirmButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) signOut(auth);
+        });
+    };
+
+    document.getElementById('nav-store').onclick = () => Swal.fire('المتجر', 'قريباً...', 'info');
+    document.getElementById('nav-lotto').onclick = () => Swal.fire('اليانصيب', 'قريباً...', 'warning');
 </script>
 </body>
 </html>
